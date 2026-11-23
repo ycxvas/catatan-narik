@@ -8,14 +8,15 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap">
 <style>
 :root {
   color-scheme: light;
   --bg: #F5F5F5; --surface: #FFFFFF; --fg: #1A1A1A; --muted: #666666; --line: #E5E5E5; --soft: #FFF1E8;
   --accent: #F16622; --accent-fg: #FFFFFF; --accent-ink: #B34700; --bar: #F9C49A; --peak: #E8A100; --good: #0B7A4A; --bad: #BE3A2B;
-  --font-display: 'Barlow Condensed', 'Arial Narrow', 'Helvetica Neue', Arial, sans-serif;
-  --font-body: 'Barlow', 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  --font-body: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  --font-num: 'Barlow Condensed', 'Arial Narrow', 'Helvetica Neue', Arial, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -36,14 +37,14 @@ body {
 .wrap { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
 section[id] { scroll-margin-top: 12px; }
 header { border-left: 6px solid var(--accent); padding-left: 12px; }
-h1, h2 { font-family: var(--font-display); margin: 0; text-wrap: balance; }
-h1 { font-size: 34px; font-weight: 700; line-height: 1.05; }
-h2 { font-size: 22px; font-weight: 600; }
+h1, h2 { font-family: var(--font-display); margin: 0; text-wrap: balance; letter-spacing: -0.02em; }
+h1 { font-size: 30px; font-weight: 700; line-height: 1.1; }
+h2 { font-size: 20px; font-weight: 700; line-height: 1.2; }
 p { margin: 0; }
-.greet { font-size: 16px; font-weight: 600; color: var(--accent-ink); margin-bottom: 2px; }
+.greet { font-size: 15px; font-weight: 600; color: var(--accent-ink); margin-bottom: 4px; }
 .sub { color: var(--muted); margin-top: 4px; }
-.label { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-.num { font-family: var(--font-display); font-variant-numeric: tabular-nums; font-weight: 600; }
+.label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.num { font-family: var(--font-num); font-variant-numeric: tabular-nums; font-weight: 600; }
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
 button { font: inherit; cursor: pointer; }
 button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible, a:focus-visible { outline: 3px solid var(--accent-ink); outline-offset: 2px; }
@@ -57,7 +58,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .seg button { min-height: 46px; border: 0; border-radius: 9px; background: transparent; color: var(--muted); font-weight: 600; }
 .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); font-weight: 700; }
 .banner { background: var(--soft); border: 1px solid var(--accent); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
-.banner strong { font-family: var(--font-display); font-size: 20px; font-weight: 600; }
+.banner strong { font-family: var(--font-display); font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
 .banner a.btn { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
 .hero { display: flex; flex-direction: column; gap: 4px; }
 .hero .big { font-size: 58px; line-height: 1; }
@@ -73,7 +74,7 @@ form, .stack { display: flex; flex-direction: column; gap: 12px; margin-top: 12p
 .field.full { grid-column: 1 / -1; }
 .field label, .field .lab { font-size: 13px; font-weight: 600; color: var(--muted); }
 input, select { font: inherit; font-size: 16px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; min-height: 48px; padding: 0 12px; width: 100%; min-width: 0; }
-input.money { font-family: var(--font-display); font-size: 26px; font-weight: 600; }
+input.money { font-family: var(--font-num); font-size: 26px; font-weight: 600; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
 .chip { min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); font-weight: 600; font-size: 15px; }
 .chip:active { background: var(--soft); border-color: var(--accent); }
@@ -115,7 +116,7 @@ td.r, th.r { text-align: right; padding-right: 0; font-variant-numeric: tabular-
 .hist li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; padding: 12px 0; border-top: 1px solid var(--line); }
 .hist .what { min-width: 0; overflow-wrap: anywhere; }
 .hist .meta { color: var(--muted); font-size: 13px; }
-.hist .amt { font-family: var(--font-display); font-size: 22px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+.hist .amt { font-family: var(--font-num); font-size: 22px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
 .amt.in { color: var(--good); } .amt.out { color: var(--bad); }
 .del { border: 0; background: transparent; color: var(--muted); min-height: 36px; padding: 0 4px; justify-self: end; font-size: 13px; text-decoration: underline; }
 .del.armed { color: var(--bad); font-weight: 600; }
@@ -124,7 +125,7 @@ td.r, th.r { text-align: right; padding-right: 0; font-variant-numeric: tabular-
 .nav a span[aria-hidden] { font-size: 20px; line-height: 1; }
 .nav a:active { background: var(--soft); color: var(--accent-ink); }
 [hidden] { display: none !important; }
-@media (max-width: 380px) { .hero .big { font-size: 48px; } .trio .num { font-size: 20px; } }
+@media (max-width: 380px) { .hero .big { font-size: 48px; } .trio .num { font-size: 20px; } h1 { font-size: 26px; } }
 </style>
 </head>
 <body>
