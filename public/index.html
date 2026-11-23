@@ -24,36 +24,43 @@
   }
 }
 * { box-sizing: border-box; }
-html { background: var(--bg); }
+html { background: var(--bg); scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 body {
   margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.45;
-  padding-block: max(20px, env(safe-area-inset-top, 0px)) 48px;
+  padding-block: max(20px, env(safe-area-inset-top, 0px)) 100px;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
 .wrap { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+section[id] { scroll-margin-top: 12px; }
 h1, h2 { font-family: var(--font-display); margin: 0; text-wrap: balance; }
 h1 { font-size: 34px; font-weight: 700; line-height: 1.05; }
 h2 { font-size: 22px; font-weight: 600; }
 p { margin: 0; }
+.greet { font-size: 16px; font-weight: 600; color: var(--accent); margin-bottom: 2px; }
 .sub { color: var(--muted); margin-top: 4px; }
 .label { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 .num { font-family: var(--font-display); font-variant-numeric: tabular-nums; font-weight: 600; }
-.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
 button { font: inherit; cursor: pointer; }
-button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-.btn { min-height: 44px; padding: 0 16px; border-radius: 8px; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-fg); font-weight: 600; }
+button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.btn { min-height: 48px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-fg); font-weight: 600; }
 .btn.ghost { background: transparent; color: var(--accent); }
 .btn.block { width: 100%; }
-.btn.small { min-height: 36px; padding: 0 12px; font-size: 14px; }
+.btn.small { min-height: 40px; padding: 0 12px; font-size: 14px; }
 .btn:disabled { opacity: 0.6; cursor: default; }
-.seg { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 3px; gap: 3px; }
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 3px; gap: 3px; }
 .seg.two { grid-template-columns: repeat(2, 1fr); }
-.seg button { min-height: 42px; border: 0; border-radius: 7px; background: transparent; color: var(--muted); font-weight: 600; }
+.seg button { min-height: 46px; border: 0; border-radius: 9px; background: transparent; color: var(--muted); font-weight: 600; }
 .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); }
+.banner { background: var(--soft); border: 1px solid var(--accent); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.banner strong { font-family: var(--font-display); font-size: 20px; font-weight: 600; }
+.banner a.btn { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
 .hero { display: flex; flex-direction: column; gap: 4px; }
 .hero .big { font-size: 58px; line-height: 1; }
 .big.pos { color: var(--good); } .big.neg { color: var(--bad); }
+.cheer { margin-top: 6px; font-size: 15px; color: var(--muted); }
 .trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
 .trio .num { font-size: 24px; display: block; margin-top: 2px; overflow-wrap: anywhere; }
 .duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
@@ -63,20 +70,24 @@ form, .stack { display: flex; flex-direction: column; gap: 12px; margin-top: 12p
 .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .field.full { grid-column: 1 / -1; }
 .field label, .field .lab { font-size: 13px; font-weight: 600; color: var(--muted); }
-input, select { font: inherit; font-size: 16px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; min-height: 46px; padding: 0 12px; width: 100%; min-width: 0; }
-input.money { font-family: var(--font-display); font-size: 24px; font-weight: 600; }
+input, select { font: inherit; font-size: 16px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; min-height: 48px; padding: 0 12px; width: 100%; min-width: 0; }
+input.money { font-family: var(--font-display); font-size: 26px; font-weight: 600; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.chip { min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); font-weight: 600; font-size: 15px; }
+.chip:active { background: var(--soft); border-color: var(--accent); }
 .inline { display: flex; gap: 8px; align-items: stretch; }
 .inline input { flex: 1; }
-details summary { cursor: pointer; color: var(--accent); font-weight: 600; min-height: 32px; display: flex; align-items: center; }
+details summary { cursor: pointer; color: var(--accent); font-weight: 600; min-height: 36px; display: flex; align-items: center; }
 .msg { min-height: 20px; font-size: 14px; color: var(--muted); }
 .msg.err { color: var(--bad); }
+.msg.good { color: var(--good); font-weight: 600; }
 .hint { color: var(--muted); font-size: 14px; margin-top: 10px; }
-#map { height: 320px; border-radius: 8px; border: 1px solid var(--line); margin-top: 12px; z-index: 0; }
+#map { height: 320px; border-radius: 10px; border: 1px solid var(--line); margin-top: 12px; z-index: 0; }
 .chk { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); }
 .chk input { width: 20px; min-height: 20px; height: 20px; }
 .picks, .routes { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-.pick { width: 100%; text-align: left; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; color: var(--fg); min-height: 44px; }
-.route { width: 100%; text-align: left; background: var(--bg); border: 2px solid var(--line); border-radius: 10px; padding: 10px 12px; color: var(--fg); display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; align-items: baseline; }
+.pick { width: 100%; text-align: left; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; color: var(--fg); min-height: 48px; }
+.route { width: 100%; text-align: left; background: var(--bg); border: 2px solid var(--line); border-radius: 12px; padding: 10px 12px; color: var(--fg); display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; align-items: baseline; }
 .route[aria-pressed="true"] { border-color: var(--accent); background: var(--soft); }
 .route .t { font-size: 28px; }
 .route .d { color: var(--muted); font-size: 14px; }
@@ -104,8 +115,12 @@ td.r, th.r { text-align: right; padding-right: 0; font-variant-numeric: tabular-
 .hist .meta { color: var(--muted); font-size: 13px; }
 .hist .amt { font-family: var(--font-display); font-size: 22px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
 .amt.in { color: var(--good); } .amt.out { color: var(--bad); }
-.del { border: 0; background: transparent; color: var(--muted); min-height: 32px; padding: 0 4px; justify-self: end; font-size: 13px; text-decoration: underline; }
+.del { border: 0; background: transparent; color: var(--muted); min-height: 36px; padding: 0 4px; justify-self: end; font-size: 13px; text-decoration: underline; }
 .del.armed { color: var(--bad); font-weight: 600; }
+.nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 1000; display: grid; grid-template-columns: repeat(4, 1fr); background: var(--surface); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.nav a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 58px; color: var(--muted); text-decoration: none; font-size: 12px; font-weight: 600; }
+.nav a span[aria-hidden] { font-size: 20px; line-height: 1; }
+.nav a:active { background: var(--soft); color: var(--accent); }
 [hidden] { display: none !important; }
 @media (max-width: 380px) { .hero .big { font-size: 48px; } .trio .num { font-size: 20px; } }
 </style>
@@ -113,9 +128,16 @@ td.r, th.r { text-align: right; padding-right: 0; font-variant-numeric: tabular-
 <body>
 <main class="wrap">
   <header>
+    <p class="greet" id="greet"></p>
     <h1>Catatan Narik</h1>
-    <p class="sub">Untung bersih, jam ramai, peta jemput, dan cek rute anti macet.</p>
+    <p class="sub">Catat order, lihat untung bersih, dan cek rute anti macet, semua di satu tempat.</p>
   </header>
+
+  <section class="banner" id="setupBanner" hidden aria-labelledby="bannerTitle">
+    <strong id="bannerTitle">Satu langkah lagi</strong>
+    <p>Peta, cari alamat, dan cek rute butuh kata sandi aplikasi. Catat order tetap bisa dipakai tanpa itu.</p>
+    <a class="btn" href="#setCard" id="bannerGo">Isi kata sandi</a>
+  </section>
 
   <div class="seg" id="period" role="group" aria-label="Periode">
     <button type="button" data-p="today" aria-pressed="true">Hari ini</button>
@@ -126,6 +148,7 @@ td.r, th.r { text-align: right; padding-right: 0; font-variant-numeric: tabular-
   <section class="card hero" aria-labelledby="netLabel">
     <span class="label" id="netLabel">Untung bersih · hari ini</span>
     <span class="big num" id="net">Rp 0</span>
+    <p class="cheer" id="cheer"></p>
     <div class="trio">
       <div><span class="label">Pemasukan</span><span class="num" id="income">Rp 0</span></div>
       <div><span class="label">Pengeluaran</span><span class="num" id="spend">Rp 0</span></div>
@@ -147,6 +170,7 @@ td.r, th.r { text-align: right; padding-right: 0; font-variant-numeric: tabular-
       <div class="field">
         <label for="amount" id="amountLabel">Pendapatan order (Rp)</label>
         <input class="money" id="amount" type="text" inputmode="numeric" placeholder="25.000">
+        <div class="chips" id="chips" role="group" aria-label="Nominal cepat"></div>
       </div>
       <div id="tripFields" class="row">
         <div class="field full">
@@ -192,7 +216,7 @@ td.r, th.r { text-align: right; padding-right: 0; font-variant-numeric: tabular-
     </form>
   </section>
 
-  <section class="card" aria-labelledby="mapTitle">
+  <section class="card" id="mapCard" aria-labelledby="mapTitle">
     <h2 id="mapTitle">Peta dan cek rute</h2>
     <p class="sub">Titik kuning adalah tempat jemputmu. Ketuk peta untuk memilih tujuan, atau cari alamat.</p>
     <div id="map" role="application" aria-label="Peta"></div>
@@ -228,7 +252,7 @@ td.r, th.r { text-align: right; padding-right: 0; font-variant-numeric: tabular-
     </div>
   </section>
 
-  <section class="card" aria-labelledby="hoursTitle">
+  <section class="card" id="statCard" aria-labelledby="hoursTitle">
     <h2 id="hoursTitle">Jam paling ramai</h2>
     <p class="sub" id="hoursSub">Jumlah order per jam.</p>
     <div class="bars" id="bars" role="img" aria-label="Grafik jumlah order per jam"></div>
@@ -246,13 +270,13 @@ td.r, th.r { text-align: right; padding-right: 0; font-variant-numeric: tabular-
     <p class="hint" id="areaHint"></p>
   </section>
 
-  <section class="card" aria-labelledby="histTitle">
+  <section class="card" id="histCard" aria-labelledby="histTitle">
     <h2 id="histTitle">Riwayat</h2>
     <ul class="hist" id="hist"></ul>
     <button class="btn ghost block" type="button" id="more" hidden style="margin-top:8px">Tampilkan semua</button>
   </section>
 
-  <section class="card" aria-labelledby="setTitle">
+  <section class="card" id="setCard" aria-labelledby="setTitle">
     <h2 id="setTitle">Pengaturan dan cadangan</h2>
     <div class="stack">
       <div class="field">
@@ -272,6 +296,13 @@ td.r, th.r { text-align: right; padding-right: 0; font-variant-numeric: tabular-
     </div>
   </section>
 </main>
+
+<nav class="nav" aria-label="Menu utama">
+  <a href="#formCard"><span aria-hidden="true">✏️</span>Catat</a>
+  <a href="#mapCard"><span aria-hidden="true">🗺️</span>Peta</a>
+  <a href="#statCard"><span aria-hidden="true">📊</span>Statistik</a>
+  <a href="#histCard"><span aria-hidden="true">🧾</span>Riwayat</a>
+</nav>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
@@ -306,6 +337,14 @@ td.r, th.r { text-align: right; padding-right: 0; font-variant-numeric: tabular-
   function dur(sec) { var m = Math.max(1, Math.round(sec / 60)); return m >= 60 ? Math.floor(m / 60) + ' j ' + pad(m % 60) + ' mnt' : m + ' mnt'; }
   function kmText(m) { return (m / 1000).toFixed(1).replace('.', ',') + ' km'; }
   function moneyInput(el) { el.addEventListener('input', function () { var d = digits(this.value).replace(/^0+/, ''); this.value = d ? nf.format(Number(d)) : ''; }); }
+
+  /* ---------- sapaan dan banner ---------- */
+  function greeting() {
+    var h = new Date().getHours();
+    var s = h < 4 ? 'Selamat malam' : h < 11 ? 'Selamat pagi' : h < 15 ? 'Selamat siang' : h < 18 ? 'Selamat sore' : 'Selamat malam';
+    return s + '! Semangat narik, hati-hati di jalan.';
+  }
+  function updateBanner() { $('#setupBanner').hidden = !!ls.get(PIN_KEY); }
 
   /* ---------- API lewat Worker ---------- */
   async function api(path, opts) {
@@ -402,6 +441,10 @@ td.r, th.r { text-align: right; padding-right: 0; font-variant-numeric: tabular-
     $('#income').textContent = rp(income); $('#spend').textContent = rp(spend); $('#count').textContent = String(trips.length);
     $('#avg').textContent = trips.length ? rp(income / trips.length) : '–';
     $('#perkm').textContent = km > 0 ? rp(income / km) : '–';
+    var cheer;
+    if (state.period === 'today') cheer = trips.length ? 'Sudah ' + trips.length + ' order hari ini. Mantap, lanjut!' : 'Belum ada order hari ini. Catat yang pertama ya.';
+    else cheer = trips.length ? 'Total ' + trips.length + ' order dalam ' + periodName[state.period] + '.' : 'Belum ada order di periode ini.';
+    $('#cheer').textContent = cheer;
     renderHours(trips); renderAreas(trips); renderHistory(list); drawHeat(trips);
     var seen = {}, opts = '';
     state.entries.forEach(function (e) { [e.from, e.to].forEach(function (a) { a = cleanArea(a); var k = a.toLowerCase(); if (a && !seen[k]) { seen[k] = 1; opts += '<option value="' + esc(a) + '"></option>'; } }); });
@@ -433,7 +476,7 @@ td.r, th.r { text-align: right; padding-right: 0; font-variant-numeric: tabular-
   function renderHistory(list) {
     var shown = list.slice(0, state.showAll ? list.length : 30);
     $('#more').hidden = list.length <= 30 || state.showAll;
-    if (!shown.length) { $('#hist').innerHTML = '<li style="display:block;color:var(--muted)">Belum ada catatan di periode ini.</li>'; return; }
+    if (!shown.length) { $('#hist').innerHTML = '<li style="display:block;color:var(--muted)">Belum ada catatan di periode ini. Catat order pertamamu di bagian atas.</li>'; return; }
     $('#hist').innerHTML = shown.map(function (e) {
       var isTrip = e.kind === 'trip', title, meta;
       if (isTrip) {
@@ -466,9 +509,21 @@ td.r, th.r { text-align: right; padding-right: 0; font-variant-numeric: tabular-
   }
 
   /* ---------- events ---------- */
-  function setMsg(el, t, err) { el.textContent = t; el.className = 'msg' + (err ? ' err' : ''); }
+  function setMsg(el, t, err, good) { el.textContent = t; el.className = 'msg' + (err ? ' err' : good ? ' good' : ''); }
   var formMsg = $('#formMsg'), routeMsg = $('#routeMsg');
   moneyInput($('#amount')); moneyInput($('#offer'));
+
+  var QUICK = { trip: [10000, 15000, 20000, 25000, 30000, 40000], exp: [5000, 10000, 20000, 50000, 100000] };
+  function renderChips() {
+    $('#chips').innerHTML = QUICK[state.kind].map(function (v) {
+      return '<button type="button" class="chip" data-v="' + v + '">' + nf.format(v) + '</button>';
+    }).join('');
+  }
+  $('#chips').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button[data-v]'); if (!b) return;
+    $('#amount').value = nf.format(Number(b.dataset.v));
+    setMsg(formMsg, '');
+  });
 
   $('#period').addEventListener('click', function (ev) {
     var b = ev.target.closest('button[data-p]'); if (!b) return;
@@ -484,6 +539,7 @@ td.r, th.r { text-align: right; padding-right: 0; font-variant-numeric: tabular-
     $('#amountLabel').textContent = trip ? 'Pendapatan order (Rp)' : 'Jumlah pengeluaran (Rp)';
     $('#submit').textContent = trip ? 'Simpan order' : 'Simpan pengeluaran';
     $('#amount').placeholder = trip ? '25.000' : '30.000';
+    renderChips();
     setMsg(formMsg, '');
   }
   $('#kind').addEventListener('click', function (ev) { var b = ev.target.closest('button[data-k]'); if (b) setKind(b.dataset.k); });
@@ -523,11 +579,12 @@ td.r, th.r { text-align: right; padding-right: 0; font-variant-numeric: tabular-
       ['plat', 'plon', 'dlat', 'dlon'].forEach(function (k) { if (typeof state.geo[k] === 'number') entry[k] = Math.round(state.geo[k] * 1e5) / 1e5; });
     } else { entry.cat = $('#cat').value; entry.note = cleanArea($('#note').value); }
     state.entries.push(entry);
+    var okText = (state.kind === 'trip' ? 'Order ' : 'Pengeluaran ') + rp(amount) + ' tersimpan. ' + (state.kind === 'trip' ? 'Mantap!' : 'Sudah tercatat.');
     if (!save()) { setMsg(formMsg, 'Tersimpan sementara, tapi browser menolak menyimpan permanen. Unduh cadangan.', true); }
-    else { setMsg(formMsg, 'Tersimpan.'); setTimeout(function () { if (formMsg.textContent === 'Tersimpan.') setMsg(formMsg, ''); }, 2500); }
+    else { setMsg(formMsg, okText, false, true); setTimeout(function () { if (formMsg.textContent === okText) setMsg(formMsg, ''); }, 3500); }
     $('#amount').value = ''; $('#km').value = ''; $('#note').value = ''; $('#from').value = ''; $('#to').value = '';
     state.geo = {}; geoNote(); state.touchedTime = false; $('#when').value = localInput(new Date());
-    $('#amount').focus(); render();
+    render();
   });
 
   $('#hist').addEventListener('click', function (ev) {
@@ -599,11 +656,12 @@ td.r, th.r { text-align: right; padding-right: 0; font-variant-numeric: tabular-
 
   /* pengaturan */
   $('#pin').value = ls.get(PIN_KEY) || '';
+  $('#bannerGo').addEventListener('click', function () { setTimeout(function () { $('#pin').focus({ preventScroll: true }); }, 400); });
   $('#pinSave').addEventListener('click', async function () {
     var v = $('#pin').value.trim(), m = $('#pinMsg');
-    if (!v) { ls.set(PIN_KEY, ''); setMsg(m, 'Kata sandi dihapus dari HP ini.'); return; }
-    ls.set(PIN_KEY, v); setMsg(m, 'Mengecek…');
-    try { await api('/api/ping'); setMsg(m, 'Terhubung ke server.'); } catch (e) { setMsg(m, e.message, true); }
+    if (!v) { ls.set(PIN_KEY, ''); updateBanner(); setMsg(m, 'Kata sandi dihapus dari HP ini.'); return; }
+    ls.set(PIN_KEY, v); updateBanner(); setMsg(m, 'Mengecek…');
+    try { await api('/api/ping'); setMsg(m, 'Terhubung ke server.', false, true); } catch (e) { setMsg(m, e.message, true); }
   });
   $('#backup').addEventListener('click', function () {
     var blob = new Blob([JSON.stringify(state.entries)], { type: 'application/json' });
@@ -629,6 +687,8 @@ td.r, th.r { text-align: right; padding-right: 0; font-variant-numeric: tabular-
   });
 
   $('#when').value = localInput(new Date());
+  $('#greet').textContent = greeting();
+  updateBanner(); renderChips();
   initMap(); render();
 })();
 </script>
