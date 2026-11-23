@@ -3,17 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#F26B00">
+<meta name="theme-color" content="#F16622">
 <title>Catatan Narik</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap">
 <style>
 :root {
   color-scheme: light;
-  --bg: #F7F4F1; --surface: #FFFFFF; --fg: #14202B; --muted: #5B6670; --line: #E2DBD4; --soft: #FFEBDD;
-  --accent: #F26B00; --accent-fg: #14202B; --accent-ink: #B34700; --bar: #F9C49A; --peak: #E8A100; --good: #0B7A4A; --bad: #BE3A2B;
+  --bg: #F5F5F5; --surface: #FFFFFF; --fg: #1A1A1A; --muted: #666666; --line: #E5E5E5; --soft: #FFF1E8;
+  --accent: #F16622; --accent-fg: #FFFFFF; --accent-ink: #B34700; --bar: #F9C49A; --peak: #E8A100; --good: #0B7A4A; --bad: #BE3A2B;
   --font-display: 'Barlow Condensed', 'Arial Narrow', 'Helvetica Neue', Arial, sans-serif;
   --font-body: 'Barlow', 'Helvetica Neue', Arial, sans-serif;
 }
@@ -47,7 +47,7 @@ p { margin: 0; }
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
 button { font: inherit; cursor: pointer; }
 button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible, a:focus-visible { outline: 3px solid var(--accent-ink); outline-offset: 2px; }
-.btn { min-height: 48px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-fg); font-weight: 600; }
+.btn { min-height: 48px; padding: 0 16px; border-radius: 8px; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-fg); font-weight: 700; }
 .btn.ghost { background: transparent; color: var(--accent-ink); border-color: var(--accent-ink); }
 .btn.block { width: 100%; }
 .btn.small { min-height: 40px; padding: 0 12px; font-size: 14px; }
@@ -55,7 +55,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .seg { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 3px; gap: 3px; }
 .seg.two { grid-template-columns: repeat(2, 1fr); }
 .seg button { min-height: 46px; border: 0; border-radius: 9px; background: transparent; color: var(--muted); font-weight: 600; }
-.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); font-weight: 700; }
 .banner { background: var(--soft); border: 1px solid var(--accent); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
 .banner strong { font-family: var(--font-display); font-size: 20px; font-weight: 600; }
 .banner a.btn { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
