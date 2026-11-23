@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Catatan Narik</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #EDF0F4; --surface: #FFFFFF; --fg: #14202B; --muted: #566676; --line: #D3DBE3; --soft: #E4EAF6;
+  --accent: #1F4FD8; --accent-fg: #FFFFFF; --peak: #E8A100; --good: #0B7A4A; --bad: #BE3A2B;
+  --font-display: 'Barlow Condensed', 'Arial Narrow', 'Helvetica Neue', Arial, sans-serif;
+  --font-body: 'Barlow', 'Helvetica Neue', Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0E151C; --surface: #17212B; --fg: #E8EEF3; --muted: #94A4B3; --line: #2A3846; --soft: #1D2A40;
+    --accent: #7399FF; --accent-fg: #0E151C; --peak: #F5B82E; --good: #4CC38A; --bad: #FF8A7A;
+  }
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body {
+  margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.45;
+  padding-block: max(20px, env(safe-area-inset-top, 0px)) 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+h1, h2 { font-family: var(--font-display); margin: 0; text-wrap: balance; }
+h1 { font-size: 34px; font-weight: 700; line-height: 1.05; }
+h2 { font-size: 22px; font-weight: 600; }
+p { margin: 0; }
+.sub { color: var(--muted); margin-top: 4px; }
+.label { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.num { font-family: var(--font-display); font-variant-numeric: tabular-nums; font-weight: 600; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+button { font: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.btn { min-height: 44px; padding: 0 16px; border-radius: 8px; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-fg); font-weight: 600; }
+.btn.ghost { background: transparent; color: var(--accent); }
+.btn.block { width: 100%; }
+.btn.small { min-height: 36px; padding: 0 12px; font-size: 14px; }
+.btn:disabled { opacity: 0.6; cursor: default; }
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 3px; gap: 3px; }
+.seg.two { grid-template-columns: repeat(2, 1fr); }
+.seg button { min-height: 42px; border: 0; border-radius: 7px; background: transparent; color: var(--muted); font-weight: 600; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); }
+.hero { display: flex; flex-direction: column; gap: 4px; }
+.hero .big { font-size: 58px; line-height: 1; }
+.big.pos { color: var(--good); } .big.neg { color: var(--bad); }
+.trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+.trio .num { font-size: 24px; display: block; margin-top: 2px; overflow-wrap: anywhere; }
+.duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+.duo .num { font-size: 20px; display: block; margin-top: 2px; }
+form, .stack { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+.row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.field.full { grid-column: 1 / -1; }
+.field label, .field .lab { font-size: 13px; font-weight: 600; color: var(--muted); }
+input, select { font: inherit; font-size: 16px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; min-height: 46px; padding: 0 12px; width: 100%; min-width: 0; }
+input.money { font-family: var(--font-display); font-size: 24px; font-weight: 600; }
+.inline { display: flex; gap: 8px; align-items: stretch; }
+.inline input { flex: 1; }
+details summary { cursor: pointer; color: var(--accent); font-weight: 600; min-height: 32px; display: flex; align-items: center; }
+.msg { min-height: 20px; font-size: 14px; color: var(--muted); }
+.msg.err { color: var(--bad); }
+.hint { color: var(--muted); font-size: 14px; margin-top: 10px; }
+#map { height: 320px; border-radius: 8px; border: 1px solid var(--line); margin-top: 12px; z-index: 0; }
+.chk { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); }
+.chk input { width: 20px; min-height: 20px; height: 20px; }
+.picks, .routes { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.pick { width: 100%; text-align: left; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; color: var(--fg); min-height: 44px; }
+.route { width: 100%; text-align: left; background: var(--bg); border: 2px solid var(--line); border-radius: 10px; padding: 10px 12px; color: var(--fg); display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; align-items: baseline; }
+.route[aria-pressed="true"] { border-color: var(--accent); background: var(--soft); }
+.route .t { font-size: 28px; }
+.route .d { color: var(--muted); font-size: 14px; }
+.route .x { grid-column: 1 / -1; font-size: 14px; display: flex; gap: 8px 14px; flex-wrap: wrap; }
+.badge { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--good); }
+.delay { color: var(--bad); font-weight: 600; }
+.ok { color: var(--good); font-weight: 600; }
+.bars { display: grid; grid-template-columns: repeat(24, minmax(0, 1fr)); gap: 2px; margin-top: 12px; }
+.col { height: 120px; display: flex; align-items: flex-end; }
+.bar { width: 100%; background: var(--accent); border-radius: 2px 2px 0 0; min-height: 2px; opacity: 0.85; }
+.bar.peak { background: var(--peak); opacity: 1; }
+.bar.zero { background: var(--line); opacity: 1; }
+.ticks { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); font-size: 11px; color: var(--muted); margin-top: 4px; }
+.tophours { list-style: none; margin: 12px 0 0; padding: 0; }
+.tophours li { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 8px 0; border-top: 1px solid var(--line); }
+.tophours .when { font-weight: 600; }
+.scroll { overflow-x: auto; margin-top: 8px; }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+th { text-align: left; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; padding: 6px 8px 6px 0; }
+td { padding: 9px 8px 9px 0; border-top: 1px solid var(--line); }
+td.r, th.r { text-align: right; padding-right: 0; font-variant-numeric: tabular-nums; }
+.hist { list-style: none; margin: 8px 0 0; padding: 0; }
+.hist li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+.hist .what { min-width: 0; overflow-wrap: anywhere; }
+.hist .meta { color: var(--muted); font-size: 13px; }
+.hist .amt { font-family: var(--font-display); font-size: 22px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+.amt.in { color: var(--good); } .amt.out { color: var(--bad); }
+.del { border: 0; background: transparent; color: var(--muted); min-height: 32px; padding: 0 4px; justify-self: end; font-size: 13px; text-decoration: underline; }
+.del.armed { color: var(--bad); font-weight: 600; }
+[hidden] { display: none !important; }
+@media (max-width: 380px) { .hero .big { font-size: 48px; } .trio .num { font-size: 20px; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <h1>Catatan Narik</h1>
+    <p class="sub">Untung bersih, jam ramai, peta jemput, dan cek rute anti macet.</p>
+  </header>
+
+  <div class="seg" id="period" role="group" aria-label="Periode">
+    <button type="button" data-p="today" aria-pressed="true">Hari ini</button>
+    <button type="button" data-p="7" aria-pressed="false">7 hari</button>
+    <button type="button" data-p="30" aria-pressed="false">30 hari</button>
+  </div>
+
+  <section class="card hero" aria-labelledby="netLabel">
+    <span class="label" id="netLabel">Untung bersih · hari ini</span>
+    <span class="big num" id="net">Rp 0</span>
+    <div class="trio">
+      <div><span class="label">Pemasukan</span><span class="num" id="income">Rp 0</span></div>
+      <div><span class="label">Pengeluaran</span><span class="num" id="spend">Rp 0</span></div>
+      <div><span class="label">Order</span><span class="num" id="count">0</span></div>
+    </div>
+    <div class="duo">
+      <div><span class="label">Rata-rata per order</span><span class="num" id="avg">–</span></div>
+      <div><span class="label">Pemasukan per km</span><span class="num" id="perkm">–</span></div>
+    </div>
+  </section>
+
+  <section class="card" id="formCard" aria-labelledby="formTitle">
+    <h2 id="formTitle">Catat baru</h2>
+    <div class="seg two" id="kind" role="group" aria-label="Jenis catatan" style="margin-top:12px">
+      <button type="button" data-k="trip" aria-pressed="true">Order</button>
+      <button type="button" data-k="exp" aria-pressed="false">Pengeluaran</button>
+    </div>
+    <form id="form" autocomplete="off" novalidate>
+      <div class="field">
+        <label for="amount" id="amountLabel">Pendapatan order (Rp)</label>
+        <input class="money" id="amount" type="text" inputmode="numeric" placeholder="25.000">
+      </div>
+      <div id="tripFields" class="row">
+        <div class="field full">
+          <label for="from">Area jemput</label>
+          <div class="inline">
+            <input id="from" type="text" list="areas" placeholder="Tanah Abang" maxlength="60">
+            <button class="btn ghost small" type="button" id="gpsFrom">Lokasi saya</button>
+          </div>
+        </div>
+        <div class="field full">
+          <label for="to">Area antar</label>
+          <div class="inline">
+            <input id="to" type="text" list="areas" placeholder="Kuningan" maxlength="60">
+            <button class="btn ghost small" type="button" id="gpsTo">Lokasi saya</button>
+          </div>
+        </div>
+        <div class="field full">
+          <label for="km">Jarak (km)</label>
+          <input id="km" type="text" inputmode="decimal" placeholder="8,5">
+        </div>
+        <p class="hint full" id="geoNote" style="grid-column:1/-1;margin:0"></p>
+      </div>
+      <div id="expFields" class="row" hidden>
+        <div class="field">
+          <label for="cat">Kategori</label>
+          <select id="cat"><option>Bensin</option><option>Makan dan minum</option><option>Parkir</option><option>Tol</option><option>Servis motor</option><option>Lainnya</option></select>
+        </div>
+        <div class="field">
+          <label for="note">Catatan (boleh kosong)</label>
+          <input id="note" type="text" maxlength="80" placeholder="Pertalite 3 liter">
+        </div>
+      </div>
+      <details>
+        <summary>Ubah waktu</summary>
+        <div class="field" style="margin-top:8px">
+          <label for="when">Waktu kejadian</label>
+          <input id="when" type="datetime-local">
+        </div>
+      </details>
+      <datalist id="areas"></datalist>
+      <button class="btn block" type="submit" id="submit">Simpan order</button>
+      <p class="msg" id="formMsg" role="status"></p>
+    </form>
+  </section>
+
+  <section class="card" aria-labelledby="mapTitle">
+    <h2 id="mapTitle">Peta dan cek rute</h2>
+    <p class="sub">Titik kuning adalah tempat jemputmu. Ketuk peta untuk memilih tujuan, atau cari alamat.</p>
+    <div id="map" role="application" aria-label="Peta"></div>
+    <label class="chk" style="margin-top:10px"><input type="checkbox" id="heatOn" checked> Tampilkan titik jemput periode ini</label>
+    <div class="stack">
+      <div class="field">
+        <span class="lab">Dari</span>
+        <div class="inline">
+          <span id="fromLabel" style="flex:1;align-self:center">Belum dipilih</span>
+          <button class="btn ghost small" type="button" id="useMe">Lokasi saya</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="q">Ke</label>
+        <div class="inline">
+          <input id="q" type="text" placeholder="Cari alamat atau tempat" maxlength="120">
+          <button class="btn ghost small" type="button" id="search">Cari</button>
+        </div>
+        <ul class="picks" id="picks"></ul>
+        <span id="toLabel" class="hint" style="margin:0">Tujuan belum dipilih</span>
+      </div>
+      <div class="field">
+        <label for="offer">Tarif order yang ditawarkan (Rp, boleh kosong)</label>
+        <input id="offer" type="text" inputmode="numeric" placeholder="30.000">
+      </div>
+      <button class="btn block" type="button" id="check">Cek rute dan macet</button>
+      <p class="msg" id="routeMsg" role="status"></p>
+      <ul class="routes" id="routeList"></ul>
+      <div id="routeActions" class="inline" hidden>
+        <a class="btn ghost small" id="gmaps" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none">Buka di Google Maps</a>
+        <button class="btn ghost small" type="button" id="toForm">Catat sebagai order</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="hoursTitle">
+    <h2 id="hoursTitle">Jam paling ramai</h2>
+    <p class="sub" id="hoursSub">Jumlah order per jam.</p>
+    <div class="bars" id="bars" role="img" aria-label="Grafik jumlah order per jam"></div>
+    <div class="ticks" aria-hidden="true"><span>00</span><span>03</span><span>06</span><span>09</span><span>12</span><span>15</span><span>18</span><span>21</span></div>
+    <ul class="tophours" id="topHours"></ul>
+    <p class="hint" id="hoursHint"></p>
+  </section>
+
+  <section class="card" aria-labelledby="areaTitle">
+    <h2 id="areaTitle">Area jemput terbaik</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>Area</th><th class="r">Order</th><th class="r">Rata-rata</th></tr></thead>
+      <tbody id="areaBody"></tbody>
+    </table></div>
+    <p class="hint" id="areaHint"></p>
+  </section>
+
+  <section class="card" aria-labelledby="histTitle">
+    <h2 id="histTitle">Riwayat</h2>
+    <ul class="hist" id="hist"></ul>
+    <button class="btn ghost block" type="button" id="more" hidden style="margin-top:8px">Tampilkan semua</button>
+  </section>
+
+  <section class="card" aria-labelledby="setTitle">
+    <h2 id="setTitle">Pengaturan dan cadangan</h2>
+    <div class="stack">
+      <div class="field">
+        <label for="pin">Kata sandi aplikasi (untuk peta, cari alamat, dan cek rute)</label>
+        <div class="inline">
+          <input id="pin" type="password" autocomplete="off" placeholder="Sama dengan APP_PIN di Cloudflare">
+          <button class="btn ghost small" type="button" id="pinSave">Simpan</button>
+        </div>
+        <p class="msg" id="pinMsg" role="status"></p>
+      </div>
+      <p class="hint" style="margin:0">Catatanmu tersimpan di HP ini saja. Kalau data browser dihapus, catatan ikut hilang, jadi unduh cadangan secara berkala.</p>
+      <div class="inline">
+        <button class="btn ghost small" type="button" id="backup">Unduh cadangan</button>
+        <label class="btn ghost small" style="display:inline-flex;align-items:center;cursor:pointer">Pulihkan<input id="restore" type="file" accept="application/json,.json" hidden></label>
+      </div>
+      <p class="msg" id="backupMsg" role="status"></p>
+    </div>
+  </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (s) { return document.querySelector(s); };
+  var esc = function (s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  };
+  var nf = new Intl.NumberFormat('id-ID');
+  var rp = function (n) { return (n < 0 ? '-' : '') + 'Rp ' + nf.format(Math.abs(Math.round(n))); };
+  var pad = function (n) { return String(n).padStart(2, '0'); };
+  var hourRange = function (h) { return pad(h) + '.00–' + pad((h + 1) % 24) + '.00'; };
+  var KEY = 'catatan-narik-v2', PIN_KEY = 'catatan-narik-pin';
+  var ls = {
+    get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } }
+  };
+  function load() { try { var a = JSON.parse(ls.get(KEY) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+  var state = { entries: load(), period: 'today', kind: 'trip', showAll: false, armed: null, touchedTime: false, geo: {}, from: null, to: null, routes: [], sel: 0 };
+  function save() { return ls.set(KEY, JSON.stringify(state.entries)); }
+  function newId() { return 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function startOf(p) { var d = new Date(); d.setHours(0, 0, 0, 0); if (p === '7') d.setDate(d.getDate() - 6); if (p === '30') d.setDate(d.getDate() - 29); return d.getTime(); }
+  var periodName = { today: 'hari ini', '7': '7 hari terakhir', '30': '30 hari terakhir' };
+  function sum(list, f) { return list.reduce(function (a, e) { return a + (f(e) || 0); }, 0); }
+  function stamp(ts) { var d = new Date(ts); return d.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short' }) + ', ' + pad(d.getHours()) + '.' + pad(d.getMinutes()); }
+  function localInput(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+  function cleanArea(s) { return String(s || '').replace(/\s+/g, ' ').trim(); }
+  function digits(s) { return String(s || '').replace(/\D/g, ''); }
+  function dur(sec) { var m = Math.max(1, Math.round(sec / 60)); return m >= 60 ? Math.floor(m / 60) + ' j ' + pad(m % 60) + ' mnt' : m + ' mnt'; }
+  function kmText(m) { return (m / 1000).toFixed(1).replace('.', ',') + ' km'; }
+  function moneyInput(el) { el.addEventListener('input', function () { var d = digits(this.value).replace(/^0+/, ''); this.value = d ? nf.format(Number(d)) : ''; }); }
+
+  /* ---------- API lewat Worker ---------- */
+  async function api(path, opts) {
+    var pin = ls.get(PIN_KEY) || '';
+    if (!pin) throw new Error('Isi kata sandi di bagian Pengaturan dulu.');
+    opts = opts || {};
+    opts.headers = Object.assign({ 'x-app-pin': pin }, opts.headers || {});
+    var r = await fetch(path, opts);
+    var d = {};
+    try { d = await r.json(); } catch (e) { /* bukan JSON */ }
+    if (!r.ok) throw new Error(d.error || ('Gagal (' + r.status + ')'));
+    return d;
+  }
+  function getPos() {
+    return new Promise(function (res, rej) {
+      if (!navigator.geolocation) { rej(new Error('Browser ini tidak mendukung GPS.')); return; }
+      navigator.geolocation.getCurrentPosition(
+        function (p) { res({ lat: p.coords.latitude, lon: p.coords.longitude }); },
+        function (e) { rej(new Error(e && e.code === 1 ? 'Izin lokasi ditolak. Aktifkan izin lokasi untuk situs ini.' : 'Lokasi belum bisa didapat. Coba lagi di tempat terbuka.')); },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+      );
+    });
+  }
+  async function areaName(lat, lon) {
+    try { var d = await api('/api/reverse?lat=' + lat + '&lon=' + lon); return d.area || ''; } catch (e) { return ''; }
+  }
+
+  /* ---------- peta ---------- */
+  var map = null, heatLayer = null, routeLayer = null, pointLayer = null, fitted = false;
+  function initMap() {
+    if (!window.L) { $('#map').innerHTML = '<p class="hint" style="padding:16px">Peta gagal dimuat. Cek koneksi internet lalu muat ulang.</p>'; return; }
+    map = L.map('map').setView([-6.2, 106.82], 11);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
+    heatLayer = L.layerGroup().addTo(map);
+    routeLayer = L.layerGroup().addTo(map);
+    pointLayer = L.layerGroup().addTo(map);
+    map.on('click', function (e) { setTo({ lat: e.latlng.lat, lon: e.latlng.lng }, 'Titik di peta'); });
+  }
+  function drawHeat(trips) {
+    if (!map) return;
+    heatLayer.clearLayers();
+    if (!$('#heatOn').checked) return;
+    var cells = {};
+    trips.forEach(function (e) {
+      if (typeof e.plat !== 'number' || typeof e.plon !== 'number') return;
+      var gx = Math.round(e.plat / 0.005), gy = Math.round(e.plon / 0.005), k = gx + ',' + gy;
+      var c = cells[k] || (cells[k] = { lat: gx * 0.005, lon: gy * 0.005, n: 0, sum: 0 });
+      c.n++; c.sum += e.amount || 0;
+    });
+    var arr = Object.keys(cells).map(function (k) { return cells[k]; });
+    var max = Math.max.apply(null, arr.map(function (c) { return c.n; }).concat([1]));
+    arr.forEach(function (c) {
+      L.circle([c.lat, c.lon], { radius: 320, stroke: false, fillColor: '#E8A100', fillOpacity: 0.2 + 0.5 * c.n / max })
+        .bindTooltip(c.n + ' order · rata-rata ' + rp(c.sum / c.n)).addTo(heatLayer);
+    });
+    if (arr.length && !fitted) {
+      fitted = true;
+      if (arr.length === 1) map.setView([arr[0].lat, arr[0].lon], 14);
+      else map.fitBounds(L.latLngBounds(arr.map(function (c) { return [c.lat, c.lon]; })).pad(0.3));
+    }
+  }
+  function drawPoints() {
+    if (!map) return;
+    pointLayer.clearLayers();
+    if (state.from) L.circleMarker([state.from.lat, state.from.lon], { radius: 9, color: '#fff', weight: 3, fillColor: '#1F4FD8', fillOpacity: 1 }).bindTooltip('Dari').addTo(pointLayer);
+    if (state.to) L.circleMarker([state.to.lat, state.to.lon], { radius: 9, color: '#fff', weight: 3, fillColor: '#BE3A2B', fillOpacity: 1 }).bindTooltip('Ke').addTo(pointLayer);
+  }
+  function drawRoutes() {
+    if (!map) return;
+    routeLayer.clearLayers();
+    state.routes.forEach(function (r, i) {
+      if (i !== state.sel) L.polyline(r.points, { color: '#7a8896', weight: 4, opacity: 0.8, dashArray: '6 8' }).addTo(routeLayer);
+    });
+    var r = state.routes[state.sel];
+    if (r) {
+      var line = L.polyline(r.points, { color: '#1F4FD8', weight: 6, opacity: 0.95 }).addTo(routeLayer);
+      map.fitBounds(line.getBounds().pad(0.2));
+    }
+  }
+  function setFrom(p, label) { state.from = p; $('#fromLabel').textContent = label || ('Lokasi saya (' + p.lat.toFixed(4) + ', ' + p.lon.toFixed(4) + ')'); drawPoints(); }
+  function setTo(p, label) { state.to = p; $('#toLabel').textContent = 'Tujuan: ' + label; drawPoints(); }
+
+  /* ---------- render ---------- */
+  function render() {
+    var from = startOf(state.period);
+    var list = state.entries.filter(function (e) { return e.ts >= from; }).sort(function (a, b) { return b.ts - a.ts; });
+    var trips = list.filter(function (e) { return e.kind === 'trip'; });
+    var exps = list.filter(function (e) { return e.kind === 'exp'; });
+    var income = sum(trips, function (e) { return e.amount; });
+    var spend = sum(exps, function (e) { return e.amount; });
+    var net = income - spend, km = sum(trips, function (e) { return e.km; });
+    $('#netLabel').textContent = 'Untung bersih · ' + periodName[state.period];
+    var netEl = $('#net'); netEl.textContent = rp(net); netEl.className = 'big num ' + (net > 0 ? 'pos' : net < 0 ? 'neg' : '');
+    $('#income').textContent = rp(income); $('#spend').textContent = rp(spend); $('#count').textContent = String(trips.length);
+    $('#avg').textContent = trips.length ? rp(income / trips.length) : '–';
+    $('#perkm').textContent = km > 0 ? rp(income / km) : '–';
+    renderHours(trips); renderAreas(trips); renderHistory(list); drawHeat(trips);
+    var seen = {}, opts = '';
+    state.entries.forEach(function (e) { [e.from, e.to].forEach(function (a) { a = cleanArea(a); var k = a.toLowerCase(); if (a && !seen[k]) { seen[k] = 1; opts += '<option value="' + esc(a) + '"></option>'; } }); });
+    $('#areas').innerHTML = opts;
+  }
+  function renderHours(trips) {
+    var counts = new Array(24).fill(0), inc = new Array(24).fill(0);
+    trips.forEach(function (e) { var h = new Date(e.ts).getHours(); counts[h]++; inc[h] += e.amount || 0; });
+    var max = Math.max.apply(null, counts);
+    var top = counts.map(function (c, h) { return h; }).filter(function (h) { return counts[h] > 0; })
+      .sort(function (a, b) { return counts[b] - counts[a] || inc[b] - inc[a]; }).slice(0, 3);
+    var peak = top.length && counts[top[0]] > 1 ? top[0] : -1, html = '';
+    for (var h = 0; h < 24; h++) {
+      var c = counts[h], cls = c === 0 ? 'bar zero' : (h === peak ? 'bar peak' : 'bar');
+      html += '<div class="col" title="' + hourRange(h) + ': ' + c + ' order"><div class="' + cls + '" style="height:' + (c === 0 ? '2px' : Math.max(6, Math.round(c / max * 100)) + '%') + '"></div></div>';
+    }
+    $('#bars').innerHTML = html;
+    $('#hoursSub').textContent = 'Jumlah order per jam, ' + periodName[state.period] + '.';
+    $('#topHours').innerHTML = top.map(function (h) { return '<li><span class="when">' + hourRange(h) + '</span><span>' + counts[h] + ' order · rata-rata ' + rp(inc[h] / counts[h]) + '</span></li>'; }).join('');
+    $('#hoursHint').textContent = trips.length < 5 ? 'Datanya masih sedikit. Pola jam makin terlihat setelah beberapa hari sampai beberapa minggu dicatat.' : '';
+  }
+  function renderAreas(trips) {
+    var map2 = {};
+    trips.forEach(function (e) { var a = cleanArea(e.from); if (!a) return; var k = a.toLowerCase(); if (!map2[k]) map2[k] = { name: a, count: 0, sum: 0 }; map2[k].count++; map2[k].sum += e.amount || 0; });
+    var rows = Object.keys(map2).map(function (k) { return map2[k]; }).sort(function (a, b) { return b.count - a.count || (b.sum / b.count) - (a.sum / a.count); }).slice(0, 5);
+    $('#areaBody').innerHTML = rows.map(function (r) { return '<tr><td>' + esc(r.name) + '</td><td class="r">' + r.count + '</td><td class="r">' + rp(r.sum / r.count) + '</td></tr>'; }).join('');
+    $('#areaHint').textContent = rows.length ? 'Diurutkan dari area yang paling sering jadi titik jemput.' : 'Isi area jemput saat mencatat order supaya daftar ini terisi.';
+  }
+  function renderHistory(list) {
+    var shown = list.slice(0, state.showAll ? list.length : 30);
+    $('#more').hidden = list.length <= 30 || state.showAll;
+    if (!shown.length) { $('#hist').innerHTML = '<li style="display:block;color:var(--muted)">Belum ada catatan di periode ini.</li>'; return; }
+    $('#hist').innerHTML = shown.map(function (e) {
+      var isTrip = e.kind === 'trip', title, meta;
+      if (isTrip) {
+        var route = [cleanArea(e.from), cleanArea(e.to)].filter(Boolean).join(' → ');
+        title = 'Order' + (route ? ' · ' + esc(route) : '');
+        meta = stamp(e.ts) + (e.km ? ' · ' + String(e.km).replace('.', ',') + ' km' : '');
+      } else { title = esc(e.cat || 'Pengeluaran') + (e.note ? ' · ' + esc(e.note) : ''); meta = stamp(e.ts); }
+      var armed = state.armed === e.id;
+      return '<li><div class="what"><div>' + title + '</div><div class="meta">' + esc(meta) + '</div></div>' +
+        '<div class="amt ' + (isTrip ? 'in' : 'out') + '">' + (isTrip ? '+' : '-') + rp(e.amount) + '</div>' +
+        '<div></div><button type="button" class="del' + (armed ? ' armed' : '') + '" data-del="' + esc(e.id) + '">' + (armed ? 'Yakin hapus?' : 'Hapus') + '</button></li>';
+    }).join('');
+  }
+  function renderRoutes() {
+    var offer = Number(digits($('#offer').value)) || 0;
+    var fastest = 0;
+    state.routes.forEach(function (r, i) { if (r.seconds < state.routes[fastest].seconds) fastest = i; });
+    $('#routeList').innerHTML = state.routes.map(function (r, i) {
+      var delay = r.delaySeconds >= 60 ? '<span class="delay">+' + Math.round(r.delaySeconds / 60) + ' mnt macet</span>' : '<span class="ok">Lancar</span>';
+      var rph = offer ? '<span>≈ ' + rp(offer / (r.seconds / 3600)) + ' per jam (waktu di jalan saja)</span>' : '';
+      return '<li><button type="button" class="route" data-r="' + i + '" aria-pressed="' + (i === state.sel) + '">' +
+        '<span class="t num">' + dur(r.seconds) + '</span><span class="d">' + kmText(r.meters) + (i === fastest ? ' · <span class="badge">Tercepat</span>' : '') + '</span>' +
+        '<span class="x">' + delay + rph + '</span></button></li>';
+    }).join('');
+    var show = state.routes.length > 0;
+    $('#routeActions').hidden = !show;
+    if (show && state.from && state.to) {
+      $('#gmaps').href = 'https://www.google.com/maps/dir/?api=1&origin=' + state.from.lat + ',' + state.from.lon + '&destination=' + state.to.lat + ',' + state.to.lon + '&travelmode=two-wheeler';
+    }
+  }
+
+  /* ---------- events ---------- */
+  function setMsg(el, t, err) { el.textContent = t; el.className = 'msg' + (err ? ' err' : ''); }
+  var formMsg = $('#formMsg'), routeMsg = $('#routeMsg');
+  moneyInput($('#amount')); moneyInput($('#offer'));
+
+  $('#period').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button[data-p]'); if (!b) return;
+    state.period = b.dataset.p; state.showAll = false;
+    Array.prototype.forEach.call(this.querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+    render();
+  });
+  function setKind(k) {
+    state.kind = k;
+    Array.prototype.forEach.call($('#kind').querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', String(x.dataset.k === k)); });
+    var trip = k === 'trip';
+    $('#tripFields').hidden = !trip; $('#expFields').hidden = trip;
+    $('#amountLabel').textContent = trip ? 'Pendapatan order (Rp)' : 'Jumlah pengeluaran (Rp)';
+    $('#submit').textContent = trip ? 'Simpan order' : 'Simpan pengeluaran';
+    $('#amount').placeholder = trip ? '25.000' : '30.000';
+    setMsg(formMsg, '');
+  }
+  $('#kind').addEventListener('click', function (ev) { var b = ev.target.closest('button[data-k]'); if (b) setKind(b.dataset.k); });
+  $('#when').addEventListener('input', function () { state.touchedTime = true; });
+
+  function geoNote() {
+    var g = state.geo, t = [];
+    if (typeof g.plat === 'number') t.push('Titik jemput tersimpan');
+    if (typeof g.dlat === 'number') t.push('titik antar tersimpan');
+    $('#geoNote').textContent = t.length ? t.join(', ') + '.' : '';
+  }
+  async function gpsFor(which) {
+    var btn = which === 'from' ? $('#gpsFrom') : $('#gpsTo'), input = which === 'from' ? $('#from') : $('#to');
+    btn.disabled = true; var old = btn.textContent; btn.textContent = 'Mencari…';
+    try {
+      var p = await getPos();
+      if (which === 'from') { state.geo.plat = p.lat; state.geo.plon = p.lon; } else { state.geo.dlat = p.lat; state.geo.dlon = p.lon; }
+      geoNote();
+      if (!input.value.trim()) { var a = await areaName(p.lat, p.lon); if (a) input.value = a; }
+    } catch (e) { setMsg(formMsg, e.message, true); }
+    btn.disabled = false; btn.textContent = old;
+  }
+  $('#gpsFrom').addEventListener('click', function () { gpsFor('from'); });
+  $('#gpsTo').addEventListener('click', function () { gpsFor('to'); });
+
+  $('#form').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var amount = Number(digits($('#amount').value));
+    if (!amount) { setMsg(formMsg, 'Isi jumlah rupiahnya dulu.', true); $('#amount').focus(); return; }
+    var ts = Date.now();
+    if (state.touchedTime && $('#when').value) { var t = new Date($('#when').value).getTime(); if (!isNaN(t)) ts = t; }
+    var entry = { id: newId(), kind: state.kind, ts: ts, amount: amount };
+    if (state.kind === 'trip') {
+      var km = parseFloat(String($('#km').value).replace(',', '.'));
+      if (!isNaN(km) && km > 0) entry.km = Math.round(km * 10) / 10;
+      entry.from = cleanArea($('#from').value); entry.to = cleanArea($('#to').value);
+      ['plat', 'plon', 'dlat', 'dlon'].forEach(function (k) { if (typeof state.geo[k] === 'number') entry[k] = Math.round(state.geo[k] * 1e5) / 1e5; });
+    } else { entry.cat = $('#cat').value; entry.note = cleanArea($('#note').value); }
+    state.entries.push(entry);
+    if (!save()) { setMsg(formMsg, 'Tersimpan sementara, tapi browser menolak menyimpan permanen. Unduh cadangan.', true); }
+    else { setMsg(formMsg, 'Tersimpan.'); setTimeout(function () { if (formMsg.textContent === 'Tersimpan.') setMsg(formMsg, ''); }, 2500); }
+    $('#amount').value = ''; $('#km').value = ''; $('#note').value = ''; $('#from').value = ''; $('#to').value = '';
+    state.geo = {}; geoNote(); state.touchedTime = false; $('#when').value = localInput(new Date());
+    $('#amount').focus(); render();
+  });
+
+  $('#hist').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button[data-del]'); if (!b) return;
+    var id = b.dataset.del;
+    if (state.armed !== id) { state.armed = id; render(); setTimeout(function () { if (state.armed === id) { state.armed = null; render(); } }, 4000); return; }
+    state.armed = null;
+    state.entries = state.entries.filter(function (e) { return e.id !== id; });
+    save(); render();
+  });
+  $('#more').addEventListener('click', function () { state.showAll = true; render(); });
+  $('#heatOn').addEventListener('change', render);
+
+  /* rute */
+  $('#useMe').addEventListener('click', async function () {
+    var b = this; b.disabled = true; setMsg(routeMsg, 'Mencari lokasimu…');
+    try { var p = await getPos(); setFrom(p); setMsg(routeMsg, ''); if (map && !state.to) map.setView([p.lat, p.lon], 14); }
+    catch (e) { setMsg(routeMsg, e.message, true); }
+    b.disabled = false;
+  });
+  $('#search').addEventListener('click', async function () {
+    var q = $('#q').value.trim(); if (q.length < 3) { setMsg(routeMsg, 'Tulis minimal 3 huruf.', true); return; }
+    var b = this; b.disabled = true; setMsg(routeMsg, 'Mencari…');
+    try {
+      var near = state.from ? '&lat=' + state.from.lat + '&lon=' + state.from.lon : '';
+      var d = await api('/api/geocode?q=' + encodeURIComponent(q) + near);
+      var res = d.results || [];
+      $('#picks').innerHTML = res.map(function (r, i) { return '<li><button type="button" class="pick" data-i="' + i + '">' + esc(r.name) + '</button></li>'; }).join('');
+      state.picks = res;
+      setMsg(routeMsg, res.length ? 'Pilih salah satu hasil.' : 'Tidak ada hasil. Coba nama lain atau ketuk peta.', !res.length);
+    } catch (e) { setMsg(routeMsg, e.message, true); }
+    b.disabled = false;
+  });
+  $('#picks').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button[data-i]'); if (!b) return;
+    var r = (state.picks || [])[Number(b.dataset.i)]; if (!r) return;
+    setTo({ lat: r.lat, lon: r.lon }, r.name.split(',').slice(0, 2).join(','));
+    $('#picks').innerHTML = ''; setMsg(routeMsg, '');
+    if (map) map.setView([r.lat, r.lon], 14);
+  });
+  $('#check').addEventListener('click', async function () {
+    var b = this; b.disabled = true; setMsg(routeMsg, 'Menghitung rute…');
+    try {
+      if (!state.from) { setMsg(routeMsg, 'Mencari lokasimu…'); setFrom(await getPos()); }
+      if (!state.to) throw new Error('Pilih tujuan dulu: cari alamat atau ketuk peta.');
+      var d = await api('/api/route', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ from: state.from, to: state.to }) });
+      state.routes = d.routes || []; state.sel = 0;
+      if (!state.routes.length) throw new Error('Rute tidak ditemukan.');
+      renderRoutes(); drawRoutes();
+      setMsg(routeMsg, d.mode === 'car' ? 'Mode motor tidak tersedia, rute dihitung untuk mobil. Jalan yang cocok untuk motor bisa berbeda.' : '');
+    } catch (e) { setMsg(routeMsg, e.message, true); }
+    b.disabled = false;
+  });
+  $('#routeList').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button[data-r]'); if (!b) return;
+    state.sel = Number(b.dataset.r); renderRoutes(); drawRoutes();
+  });
+  $('#offer').addEventListener('input', function () { if (state.routes.length) renderRoutes(); });
+  $('#toForm').addEventListener('click', async function () {
+    var r = state.routes[state.sel]; if (!r || !state.from || !state.to) return;
+    setKind('trip');
+    $('#km').value = (r.meters / 1000).toFixed(1).replace('.', ',');
+    if ($('#offer').value) $('#amount').value = $('#offer').value;
+    state.geo = { plat: state.from.lat, plon: state.from.lon, dlat: state.to.lat, dlon: state.to.lon }; geoNote();
+    $('#formCard').scrollIntoView({ behavior: 'smooth' });
+    if (!$('#from').value) { var a = await areaName(state.from.lat, state.from.lon); if (a && !$('#from').value) $('#from').value = a; }
+    if (!$('#to').value) { var z = await areaName(state.to.lat, state.to.lon); if (z && !$('#to').value) $('#to').value = z; }
+  });
+
+  /* pengaturan */
+  $('#pin').value = ls.get(PIN_KEY) || '';
+  $('#pinSave').addEventListener('click', async function () {
+    var v = $('#pin').value.trim(), m = $('#pinMsg');
+    if (!v) { ls.set(PIN_KEY, ''); setMsg(m, 'Kata sandi dihapus dari HP ini.'); return; }
+    ls.set(PIN_KEY, v); setMsg(m, 'Mengecek…');
+    try { await api('/api/ping'); setMsg(m, 'Terhubung ke server.'); } catch (e) { setMsg(m, e.message, true); }
+  });
+  $('#backup').addEventListener('click', function () {
+    var blob = new Blob([JSON.stringify(state.entries)], { type: 'application/json' });
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'catatan-narik-' + localInput(new Date()).slice(0, 10) + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+    setMsg($('#backupMsg'), 'Cadangan diunduh (' + state.entries.length + ' catatan).');
+  });
+  $('#restore').addEventListener('change', function () {
+    var f = this.files && this.files[0], m = $('#backupMsg'); if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () {
+      try {
+        var arr = JSON.parse(rd.result); if (!Array.isArray(arr)) throw new Error('x');
+        var have = {}; state.entries.forEach(function (e) { have[e.id] = 1; });
+        var added = 0;
+        arr.forEach(function (e) { if (e && e.id && (e.kind === 'trip' || e.kind === 'exp') && typeof e.ts === 'number' && typeof e.amount === 'number' && !have[e.id]) { state.entries.push(e); have[e.id] = 1; added++; } });
+        save(); render(); setMsg(m, added + ' catatan dipulihkan.');
+      } catch (e) { setMsg(m, 'File cadangan tidak bisa dibaca.', true); }
+    };
+    rd.readAsText(f); this.value = '';
+  });
+
+  $('#when').value = localInput(new Date());
+  initMap(); render();
+})();
+</script>
+</body>
+</html>
